@@ -85,9 +85,9 @@ now you can safely test using /dev/loopXX /dev/loopYY arguments
 
 ## exitcodes
 
-0 - ok
-1 - missing arguments
-3 - can't fit source with destination device size
+- 0 : ok
+- 1 : missing arguments
+- 3 : can't fit source with destination device size
 
 ## execution test
 ```
