@@ -15,6 +15,8 @@ Slots are filled and consumed sequentially and with each reader slot is associat
   - `cd clone-disk ; dotnet build`
 - execution ( from clone-disk directory )
   - `dotnet bin/Debug/netcoreapp2.0/clone-disk.dll`
+  
+*Note: disk must umounted*
 
 ## syntax
 
