@@ -5,7 +5,7 @@ Linux Utility to clone disk reading parallel to write
 
 using dd to clone disk takes double of the time due to the fact it write data after each block read; with clone-disk instead  you can clone the disk in half time respect dd allowing each disk to run to maximum speed ( at the mean time at write speed of destination disk ).
 It works by 8 slots of 64MB each used by reader and writer; at first reader fill 8 slots without blocking itself and writer start when first slot available to write down and when finished it signal reader to reuse slot consumed while writer wait again for any of reader slot become available.
-Slots are filled and consumed sequentially and with each reader slot is associated a slot length to manage end of the disk chunks reading ( disk is not multiple of 64MB so last writing could smaller ).
+Slots are filled and consumed sequentially and with each reader slot is associated a slot length to manage end of the disk chunks reading ( disk is not multiple of 64MB so last writing could smaller but sw also consider this case ).
 
 ## installation and execution
 
