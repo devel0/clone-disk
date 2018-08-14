@@ -119,7 +119,7 @@ $ dd if=/dev/sdb bs=512 count=$(cat /sys/class/block/sdb/size) | md5sum
 2000398934016 bytes (2.0 TB, 1.8 TiB) copied, 20865.2 s, 95.9 MB/s
 7d498cf3de1867f4c1a92fd00bb792a3  -
 
-$ dd if=/dev/sdb bs=512 count=$(cat /sys/class/block/sdc/size) | md5sum
+$ dd if=/dev/sdc bs=512 count=$(cat /sys/class/block/sdc/size) | md5sum
 
 3907029168+0 records in
 3907029168+0 records out
