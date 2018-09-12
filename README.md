@@ -24,15 +24,13 @@ Slots are filled and consumed sequentially and with each reader slot is associat
 clone-disk <source> <dest>
 ```
 
+> **Warning : double check source and destination device** the program not ask for a confirmation after started
+
 ## example
 
 ```
 clone-disk /dev/sdb /dev/sdc
 ```
-
-## warning
-
-> **Warning : double check source and destination device** the program not ask for a confirmation after started
 
 ## source and destination identification
 
