@@ -7,15 +7,27 @@ using dd to clone disk takes double of the time due to the fact it write data af
 It works by 8 slots of 64MB each used by reader and writer; at first reader fill 8 slots without blocking itself and writer start when first slot available to write down and when finished it signal reader to reuse slot consumed while writer wait again for any of reader slot become available.
 Slots are filled and consumed sequentially and with each reader slot is associated a slot length to manage end of the disk chunks reading ( disk is not multiple of 64MB so last writing could smaller but sw also consider this case ).
 
-## installation and execution
+## Quickstart
 
-- installation
-  - install [dotnet](https://www.microsoft.com/net/learn/get-started-with-dotnet-tutorial) by choosing your distribution version
-  - clone repo
-  - `cd clone-disk ; dotnet build`
-- execution ( from clone-disk directory )
-  - `dotnet bin/Debug/netcoreapp2.0/clone-disk.dll`
-  
+- Requirements: [Download NET Core SDK](https://dotnet.microsoft.com/download)
+- Install the tool:
+
+```sh
+dotnet tool install -g clone-disk
+```
+
+- To update if already installed:
+
+```sh
+dotnet tool update -g clone-disk
+```
+
+- if `~/.dotnet/tools` dotnet global tool isn't in path it can be added to your `~/.bashrc`
+
+```sh
+echo 'export PATH=$PATH:~/.dotnet/tools' >> ~/.bashrc
+```
+
 *Note: disk must umounted*
 
 ## syntax
@@ -24,9 +36,11 @@ Slots are filled and consumed sequentially and with each reader slot is associat
 clone-disk <source> <dest>
 ```
 
-> **Warning : double check source and destination device** the program not ask for a confirmation after started
+> **Warning : double check source and destination device** the program take a change to interrupt at start prompt pressing `ctrl+c`
 
 ## example
+
+copy contents of source disk /dev/sdb to target disk /dev/sdc
 
 ```
 clone-disk /dev/sdb /dev/sdc
@@ -71,12 +85,32 @@ Tune arguments in `.vscode/launch.json` ( "args" under "configurations" ) then H
 You can test using loopback devices for a test purpose initializing these as follow ( replace XX, YY with free numbers watching at /dev/loop* files already allocated )
 
 ```
-dd if=/dev/urandom of=loopA bs=512 count=204800
-dd if=/dev/urandom of=loopB bs=512 count=204800
-mknod /dev/loopXX b 7 XX
-mknod /dev/loopYY b 7 YY
-losetup /dev/loopXX loopA
-losetup /dev/loopYY loopB
+dd if=/dev/zero of=test1 bs=1M count=100
+dd if=/dev/zero of=test2 bs=1M count=100
+losetup -fP test1
+losetup -fP test2
+srcloop=$(losetup --list | grep `pwd`/test1 | awk '{print $1}')
+dstloop=$(losetup --list | grep `pwd`/test2 | awk '{print $1}')
+if [[ "$srcloop" == "" || "$dstloop" == "" ]]; then
+  echo "couldn't find some loop dev"
+else
+  mkdir -p SRC
+  mkfs.ext3 $srcloop
+  mount $srcloop SRC
+  ls /etc > SRC/file.txt
+  umount SRC
+  clone-disk --non-interactive $srcloop $dstloop
+  mount $srcloop SRC
+  mkdir -p DST
+  mount $dstloop DST
+  diff SRC/file.txt DST/file.txt
+  if [ "$?" == "0" ]; then echo "tested successfully"; else echo "test ERROR"; fi
+  umount SRC
+  umount DST
+  losetup -d $srcloop
+  losetup -d $dstloop
+  rm -f test1 test2  
+fi
 ```
 
 now you can safely test using /dev/loopXX /dev/loopYY arguments
@@ -84,10 +118,10 @@ now you can safely test using /dev/loopXX /dev/loopYY arguments
 ## exitcodes
 
 - 0 : ok
-- 1 : missing arguments
 - 3 : can't fit source with destination device size
 
 ## execution test
+
 ```
 root@bigone:/opt/clone-disk# /root/tmp-test-clone 
 retrieving device size [/sys/class/block/sdb/size] = 3907029168 ( x 512 bytes blocks ) = 2000398934016 bytes = 1.8 Tb
